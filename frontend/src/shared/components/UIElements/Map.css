@@ -1,0 +1,5 @@
+/* needed for the map to appear */
+.map {
+  width: 100%;
+  height: 100%;
+}
