@@ -5,7 +5,7 @@ const placesRoutes = require('./routes/places-routes');
 
 const app = express();
 
-app.use(placesRoutes); // register the middlewares
+app.use('/api/places', placesRoutes); // register the middlewares
 
 
 
