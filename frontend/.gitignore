@@ -24,4 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /npm-temp-cache
-/src/table.html
+.npmrc
+src/table.html

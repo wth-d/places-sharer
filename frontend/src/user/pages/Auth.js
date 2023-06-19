@@ -73,7 +73,7 @@ const Auth = () => {
 
   return (
     <Card className="authentication">
-      <h2>Login Required</h2>
+      <h2>{isLoginMode ? "Login Required" : "Signup"}</h2>
       <hr />
       <form className="place-form" onSubmit={loginSubmitHandler}>
         {!isLoginMode && (
