@@ -11,4 +11,8 @@ router.get('/user/:uid', placesControllers.getPlaceByUserId);
 
 router.post('/', placesControllers.createPlace);
 
+router.patch('/:pId', placesControllers.updatePlace);
+
+router.delete('/:pId', placesControllers.deletePlace);
+
 module.exports = router; // export the router object (into app.js)

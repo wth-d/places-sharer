@@ -97,7 +97,28 @@ const createPlace = (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
+const updatePlace = (req, res, next) => {
+  const placeId = req.params.pId;
+  const { title, description } = req.body;
+
+  // updating a new copy instead of directly modifying the original object
+  const updatedPlaceCopy = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  updatedPlaceCopy.title = title;
+  updatedPlaceCopy.description = description;
+
+  DUMMY_PLACES[placeIndex] = updatedPlaceCopy;
+
+  res.status(200).json({ "updated-place": updatedPlaceCopy });
+};
+
+const deletePlace = (req, res, next) => {
+  const placeId = req.params.pId;
+};
+
 // export into places-routes.js
 exports.getPlaceById = getPlaceById;
 exports.getPlaceByUserId = getPlaceByUserId;
 exports.createPlace = createPlace;
+exports.updatePlace = updatePlace;
+exports.deletePlace = deletePlace;
