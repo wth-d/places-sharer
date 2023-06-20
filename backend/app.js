@@ -5,9 +5,13 @@ const placesRoutes = require('./routes/places-routes');
 
 const app = express();
 
+app.use(bodyParser.json());
+// automatically calls next() to go to next middleware;
+
 app.use('/api/places', placesRoutes); // register the middlewares
 
 app.use((error, req, res, next) => {
+  console.log("error-handling middleware in app.js");
   if (res.headerSent) {
     // a response has somehow already been sent
     next(error);

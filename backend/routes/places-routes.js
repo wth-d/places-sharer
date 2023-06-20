@@ -9,4 +9,6 @@ router.get('/:pId', placesControllers.getPlaceById);
 
 router.get('/user/:uid', placesControllers.getPlaceByUserId);
 
-module.exports = router; // export the router object
+router.post('/', placesControllers.createPlace);
+
+module.exports = router; // export the router object (into app.js)

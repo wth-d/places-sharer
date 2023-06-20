@@ -1,3 +1,6 @@
+const uuid = require('uuid');
+// const uuidv4 = uuid.v4; // then to use: uuidv4()
+
 const HttpError = require('../models/http-error');
 
 const DUMMY_PLACES = [
@@ -77,5 +80,24 @@ const getPlaceByUserId = (req, res, next) => {
   }
 };
 
+const createPlace = (req, res, next) => {
+  const { title, description, coordinates, address, creator } = req.body;
+  // same as: const title = req.body.title;
+  const createdPlace = {
+    id: uuid.v4(),
+    title,
+    description,
+    location: coordinates,
+    address,
+    creator,
+  };
+
+  DUMMY_PLACES.push(createdPlace); // or: .unshift(createdPlace)
+
+  res.status(201).json({ place: createdPlace });
+};
+
+// export into places-routes.js
 exports.getPlaceById = getPlaceById;
 exports.getPlaceByUserId = getPlaceByUserId;
+exports.createPlace = createPlace;
