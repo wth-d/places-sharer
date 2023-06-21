@@ -3,6 +3,7 @@ const uuid = require('uuid');
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const getCoordinatesForAddress = require('../util/location');
 
 let DUMMY_PLACES = [
   {
@@ -82,7 +83,7 @@ const getPlacesByUserId = (req, res, next) => {
   }
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
   if (!errors.isEmpty()) {
     console.log(errors);
@@ -90,7 +91,16 @@ const createPlace = (req, res, next) => {
     return;
   }
 
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
+
+  let coordinates;
+  try {
+    coordinates = await getCoordinatesForAddress(address);
+  } catch (error) {
+    next(error); // forward the error
+    return; // and exit this function
+  }
+
   // same as: const title = req.body.title;
   const createdPlace = {
     id: uuid.v4(),
