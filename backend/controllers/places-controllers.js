@@ -3,7 +3,7 @@ const uuid = require('uuid');
 
 const HttpError = require('../models/http-error');
 
-const DUMMY_PLACES = [
+let DUMMY_PLACES = [
   {
     id: "p2",
     title: "Robarts Library #2",
@@ -114,6 +114,11 @@ const updatePlace = (req, res, next) => {
 
 const deletePlace = (req, res, next) => {
   const placeId = req.params.pId;
+  DUMMY_PLACES = DUMMY_PLACES.filter((p) => {
+    p.id !== placeId;
+  });
+
+  res.status(200).json({ message: "Deleted place." });
 };
 
 // export into places-routes.js
