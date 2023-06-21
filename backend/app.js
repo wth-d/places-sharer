@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const placesRoutes = require('./routes/places-routes');
+const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
 
 const app = express();
@@ -10,6 +11,7 @@ app.use(bodyParser.json());
 // automatically calls next() to go to next middleware;
 
 app.use('/api/places', placesRoutes); // register the middlewares
+app.use('/api/users', usersRoutes);
 
 // handles unsupported routes;
 // this middleware is reached only if a request wasn't handled by 

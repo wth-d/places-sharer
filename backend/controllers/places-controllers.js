@@ -55,7 +55,7 @@ const getPlaceById = (req, res, next) => {
   }
 };
 
-const getPlaceByUserId = (req, res, next) => {
+const getPlacesByUserId = (req, res, next) => {
   const userId = req.params.uid;
 
   const places = [];
@@ -64,14 +64,15 @@ const getPlaceByUserId = (req, res, next) => {
       places.push(place);
     }
   }
+  // or: use places = DUMMY_PLACES.filter((p) => p.creator === userId);
 
-  if (places.length === 0) {
+  if (!places || places.length === 0) {
     // res
     //   .status(404)
     //   .json({ message: "Could not find a place for the provided user id." });
 
     const error = new HttpError(
-      "Could not find a place for the provided user id.",
+      "Could not find any place for the provided user id.",
       404
     ); // has a message prop
     next(error);
@@ -123,7 +124,7 @@ const deletePlace = (req, res, next) => {
 
 // export into places-routes.js
 exports.getPlaceById = getPlaceById;
-exports.getPlaceByUserId = getPlaceByUserId;
+exports.getPlacesByUserId = getPlacesByUserId;
 exports.createPlace = createPlace;
 exports.updatePlace = updatePlace;
 exports.deletePlace = deletePlace;
