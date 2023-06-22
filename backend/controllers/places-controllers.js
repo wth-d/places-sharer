@@ -4,6 +4,7 @@ const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 const getCoordinatesForAddress = require('../util/location');
+const Place = require('../models/place');
 
 let DUMMY_PLACES = [
   {
@@ -92,27 +93,45 @@ const createPlace = async (req, res, next) => {
   }
 
   const { title, description, address, creator } = req.body;
+  // same as: const title = req.body.title;
 
   let coordinates;
   try {
     coordinates = await getCoordinatesForAddress(address);
   } catch (error) {
+    console.log("getCoordinatesForAddress error");
     next(error); // forward the error
     return; // and exit this function
   }
 
-  // same as: const title = req.body.title;
-  const createdPlace = {
-    id: uuid.v4(),
+  // const createdPlace = {
+  //   id: uuid.v4(),
+  //   title,
+  //   description,
+  //   location: coordinates,
+  //   address,
+  //   creator,
+  //   // image
+  // };
+  const createdPlace = new Place({
     title,
     description,
+    image:
+      "https://cdn.theculturetrip.com/wp-content/uploads/2017/01/canton-tower-1200872_1920.jpg",
     location: coordinates,
     address,
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(createdPlace); // or: .unshift(createdPlace)
-
+  try {
+    await createdPlace.save();
+    // DUMMY_PLACES.push(createdPlace); // or: .unshift(createdPlace)
+  } catch (error) {
+    console.log("Creating place failed. Please try again.");
+    next(new HttpError("Creating place failed. Please try again.", 500));
+    return;
+  }
+  
   res.status(201).json({ place: createdPlace });
 };
 

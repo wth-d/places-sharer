@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
@@ -36,4 +37,15 @@ app.use((error, req, res, next) => {
 });
 
 
-app.listen(5000);
+const dbUrl = "mongodb+srv://wth:iyftPQx7QCJdehCr@cluster0.vhz6pgo.mongodb.net/places-db?retryWrites=true&w=majority";
+
+mongoose.connect(dbUrl)
+  .then(() => {
+    app.listen(5000);
+    console.log("Connected to the database!");
+  })
+  .catch((rejectReason) => {
+    console.log("Connection failed!");
+    console.log(rejectReason);
+  });
+
