@@ -6,43 +6,52 @@ const HttpError = require('../models/http-error');
 const getCoordinatesForAddress = require('../util/location');
 const Place = require('../models/place');
 
-let DUMMY_PLACES = [
-  {
-    id: "p2",
-    title: "Robarts Library #2",
-    description: "The largest library in Canada - for p2.",
-    imageUrl:
-      "https://lh3.googleusercontent.com/p/AF1QipPogTV20XRMlrjVPtlyOG5p9oeYcziXBYo_WEBf=s1360-w1360-h1020",
-    address: "130 St George St, Toronto, ON, M5S 1A5",
-    location: {
-      lat: 43.6645012,
-      lng: -79.4084233,
-    },
-    creator: "u2",
-  },
-  {
-    id: "p1",
-    title: "Robarts Library",
-    description: "The largest library in Canada.",
-    imageUrl:
-      "https://onesearch.library.utoronto.ca/sites/default/public/styles/max_650x650/public/libraryphotos/robarts-library_0.jpg?itok=Ud4zhDLg",
-    address: "130 St George St, Toronto, ON, M5S 1A5",
-    location: {
-      lat: 43.6645012,
-      lng: -79.4084233,
-    },
-    creator: "u1",
-  },
-];
+// let DUMMY_PLACES = [
+//   {
+//     id: "p2",
+//     title: "Robarts Library #2",
+//     description: "The largest library in Canada - for p2.",
+//     imageUrl:
+//       "https://lh3.googleusercontent.com/p/AF1QipPogTV20XRMlrjVPtlyOG5p9oeYcziXBYo_WEBf=s1360-w1360-h1020",
+//     address: "130 St George St, Toronto, ON, M5S 1A5",
+//     location: {
+//       lat: 43.6645012,
+//       lng: -79.4084233,
+//     },
+//     creator: "u2",
+//   },
+//   {
+//     id: "p1",
+//     title: "Robarts Library",
+//     description: "The largest library in Canada.",
+//     imageUrl:
+//       "https://onesearch.library.utoronto.ca/sites/default/public/styles/max_650x650/public/libraryphotos/robarts-library_0.jpg?itok=Ud4zhDLg",
+//     address: "130 St George St, Toronto, ON, M5S 1A5",
+//     location: {
+//       lat: 43.6645012,
+//       lng: -79.4084233,
+//     },
+//     creator: "u1",
+//   },
+// ];
 
 
-const getPlaceById = (req, res, next) => {
+const getPlaceById = async (req, res, next) => {
   // console.log("GET /:pId request in Places");
   const placeId = req.params.pId; // req.params gives: { pId: 'p1' }
 
-  const place = DUMMY_PLACES.find((p) => {
-    return p.id === placeId;
-  });
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    console.log(error);
+    next(new HttpError("Something went wrong, could not find a place.", 500));
+    return;
+  }
+  
+  // const place = DUMMY_PLACES.find((p) => {
+  //   return p.id === placeId;
+  // });
 
   if (!place) { // place === undefined
     // res.status(404);
@@ -52,23 +61,32 @@ const getPlaceById = (req, res, next) => {
       "Could not find a place for the provided pId.",
       404
     );
-    throw error;
+    next(error);
+    return;
+    // throw error;
   } else {
-    res.json({ place: place });
+    res.json({ place: place.toObject({ getters: true }) });
   }
 };
 
-const getPlacesByUserId = (req, res, next) => {
+const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
 
-  const places = [];
-  for (let place of DUMMY_PLACES) {
-    if (place.creator === userId) {
-      places.push(place);
-    }
+  let places;
+  try {
+    places = await Place.find({ creator: userId }); // find all places that match userId
+    // old: places = DUMMY_PLACES.filter((p) => p.creator === userId); // or for...of loop
+  } catch (error) {
+    console.log(error);
+    next(
+      new HttpError(
+        "Something went wrong, could not find places for the userId.",
+        500
+      )
+    );
+    return;
   }
-  // or: use places = DUMMY_PLACES.filter((p) => p.creator === userId);
-
+  
   if (!places || places.length === 0) {
     // res
     //   .status(404)
@@ -78,9 +96,13 @@ const getPlacesByUserId = (req, res, next) => {
       "Could not find any place for the provided user id.",
       404
     ); // has a message prop
+    // throw error;
     next(error);
+    return;
   } else {
-    res.json({ places: places });
+    res.json({
+      places: places.map((place) => place.toObject({ getters: true })),
+    });
   }
 };
 
@@ -100,6 +122,8 @@ const createPlace = async (req, res, next) => {
     coordinates = await getCoordinatesForAddress(address);
   } catch (error) {
     console.log("getCoordinatesForAddress error");
+    console.log("original error code:", error.code);
+    error.code = 500;
     next(error); // forward the error
     return; // and exit this function
   }
