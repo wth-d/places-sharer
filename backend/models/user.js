@@ -8,7 +8,7 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true }, // add "email" as index
   password: { type: String, required: true, minlength: 5 },
   image: { type: String, required: true },
-  places: { type: String, required: true }
+  places: [{ type: mongoose.Types.ObjectId, required: true, ref: "Place" }],
 });
 
 // "places" of a user will be dynamic, and will contain the ids of the places;

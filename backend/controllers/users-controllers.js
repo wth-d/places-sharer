@@ -39,7 +39,7 @@ const signupUser = async (req, res, next) => {
     return;
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
 
   let existingUser;
   try {
@@ -69,7 +69,7 @@ const signupUser = async (req, res, next) => {
     password,
     image:
       "https://bkimg.cdn.bcebos.com/pic/8644ebf81a4c510f7c7e489a6959252dd52aa5fc?x-bce-process=image/resize,m_lfit,w_536,limit_1/format,f_auto",
-    places
+    places: []
   });
 
   try {
