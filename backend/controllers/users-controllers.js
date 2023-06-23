@@ -13,8 +13,22 @@ const DUMMY_USERS = [
   }
 ];
 
-const getAllUsers = (req, res, next) => {
-  res.status(200).json({ users: DUMMY_USERS });
+const getAllUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, '-password'); // or: 'name email'
+  } catch (error) {
+    const err = new HttpError(
+      "Retrieving users failed. Please try again later.",
+      500
+    );
+    next(err);
+    return;
+  }
+
+  res
+    .status(200)
+    .json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signupUser = async (req, res, next) => {
@@ -70,7 +84,7 @@ const signupUser = async (req, res, next) => {
   res.status(201).json({ "user created": createdUser.toObject({ getters: true }) });
 };
 
-const loginUser = (req, res, next) => {
+const loginUser = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
   if (!errors.isEmpty()) {
     next(new HttpError("Invalid inputs passed. Please check your JSON data.", 422));
@@ -79,17 +93,41 @@ const loginUser = (req, res, next) => {
 
   const { email, password } = req.body;
 
-  const user = DUMMY_USERS.find((u) => u.email === email);
-  if (!user) {
-    next(new HttpError("User with provided email is not found.", 401));
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (error) {
+    const err = new HttpError(
+      "Search for user failed. Please try again later.",
+      500
+    );
+    next(err);
     return;
   }
 
-  if (user.password !== password) {
-    next(new HttpError("Wrong password.", 401));
-  } else {
-    res.status(200).json({ message: "Logged in." });
+  if (!existingUser || existingUser.password !== password) {
+    next(
+      new HttpError(
+        "A user with the provided email does not exist, or wrong password.",
+        401
+      )
+    );
+    return;
   }
+
+  res.status(200).json({ message: "Logged in." });
+
+  // const user = DUMMY_USERS.find((u) => u.email === email);
+  // if (!user) {
+  //   next(new HttpError("A user with the provided email does not exist.", 401));
+  //   return;
+  // }
+
+  // if (user.password !== password) {
+  //   next(new HttpError("Wrong password.", 401));
+  // } else {
+  //   res.status(200).json({ message: "Logged in." });
+  // }
 };
 
 // export into users-routes.js
