@@ -141,7 +141,7 @@ const createPlace = async (req, res, next) => {
     title,
     description,
     image:
-      "https://cdn.theculturetrip.com/wp-content/uploads/2017/01/canton-tower-1200872_1920.jpg",
+      "https://cdn.theculturetrip.com/wp-content/uploads/2017/01/canton-tower-1200872_1920.jpg", // a URL
     location: coordinates,
     address,
     creator,
@@ -181,6 +181,15 @@ const updatePlace = async (req, res, next) => {
     return;
   }
 
+  if (!place) {
+    const error = new HttpError(
+      "Could not find a place for the provided pId.",
+      404
+    );
+    next(error);
+    return;
+  }
+
   place.title = title;
   place.description = description;
 
@@ -207,16 +216,43 @@ const updatePlace = async (req, res, next) => {
   res.status(200).json({ "updated-place": place.toObject({ getters: true }) });
 };
 
-const deletePlace = (req, res, next) => {
+const deletePlace = async (req, res, next) => {
   const placeId = req.params.pId;
-  if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
-    next(new HttpError("Could not find the place.", 404));
+
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    const err = new HttpError(
+      "Something went wrong. Could not find the to-be-deleted place.",
+      500
+    );
+    next(err);
     return;
   }
-  DUMMY_PLACES = DUMMY_PLACES.filter((p) => {
-    return p.id !== placeId;
-  });
 
+  if (!place) {
+    const error = new HttpError(
+      "Could not find a place for the provided pId.",
+      404
+    );
+    next(error);
+    return;
+  }
+
+  try {
+    await place.deleteOne();
+  } catch (error) {
+    console.log(error);
+    const err = new HttpError(
+      "Something went wrong. Could not delete the place.",
+      500
+    );
+    next(err);
+    return;
+  }
+
+  console.log(place);
   res.status(200).json({ message: "Deleted place." });
 };
 
