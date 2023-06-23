@@ -121,7 +121,7 @@ const createPlace = async (req, res, next) => {
   try {
     coordinates = await getCoordinatesForAddress(address);
   } catch (error) {
-    console.log("getCoordinatesForAddress error");
+    console.log("getCoordinatesForAddress (API) error");
     console.log("original error code:", error.code);
     error.code = 500;
     next(error); // forward the error
@@ -159,7 +159,7 @@ const createPlace = async (req, res, next) => {
   res.status(201).json({ place: createdPlace });
 };
 
-const updatePlace = (req, res, next) => {
+const updatePlace = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
   if (!errors.isEmpty()) {
     next(new HttpError("Invalid inputs passed. Please check your JSON data.", 422));
@@ -169,15 +169,42 @@ const updatePlace = (req, res, next) => {
   const placeId = req.params.pId;
   const { title, description } = req.body;
 
+  let place;
+  try {
+    place = await Place.findById(placeId);
+  } catch (error) {
+    const err = new HttpError(
+      "Something went wrong. Could not find the to-be-updated place.",
+      500
+    );
+    next(err);
+    return;
+  }
+
+  place.title = title;
+  place.description = description;
+
+  try {
+    await place.save(); // save the updated place
+  } catch (error) {
+    const err = new HttpError(
+      "Something went wrong. Could not save the updated place.",
+      500
+    );
+    next(err);
+    return;
+  }
+
   // updating a new copy instead of directly modifying the original object
-  const updatedPlaceCopy = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
-  const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
-  updatedPlaceCopy.title = title;
-  updatedPlaceCopy.description = description;
+  // const updatedPlaceCopy = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
+  // const placeIndex = DUMMY_PLACES.findIndex((p) => p.id === placeId);
+  // updatedPlaceCopy.title = title;
+  // updatedPlaceCopy.description = description;
 
-  DUMMY_PLACES[placeIndex] = updatedPlaceCopy;
+  // DUMMY_PLACES[placeIndex] = updatedPlaceCopy;
 
-  res.status(200).json({ "updated-place": updatedPlaceCopy });
+  // convert Mongoose object into a JS object before sending back in response
+  res.status(200).json({ "updated-place": place.toObject({ getters: true }) });
 };
 
 const deletePlace = (req, res, next) => {
