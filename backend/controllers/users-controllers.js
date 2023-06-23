@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+const User = require('../models/user');
 
 const DUMMY_USERS = [
   {
@@ -16,7 +17,7 @@ const getAllUsers = (req, res, next) => {
   res.status(200).json({ users: DUMMY_USERS });
 };
 
-const signupUser = (req, res, next) => {
+const signupUser = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
   if (!errors.isEmpty()) {
     // console.log(errors);
@@ -24,24 +25,49 @@ const signupUser = (req, res, next) => {
     return;
   }
 
-  const { name, email, password } = req.body;
+  const { name, email, password, places } = req.body;
 
-  const duplicateUser = DUMMY_USERS.find((u) => u.email === email);
-  if (duplicateUser) {
-    next(new HttpError("A user with the provided email already exists.", 422));
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email });
+  } catch (error) {
+    const err = new HttpError(
+      "Search for duplicated user failed. Please try again later.",
+      500
+    );
+    next(err);
     return;
   }
 
-  const createdUser = {
-    id: uuid.v4(),
+  if (existingUser) {
+    next(
+      new HttpError(
+        "A user with the provided email already exists. Please login instead.",
+        422
+      )
+    );
+    return;
+  }
+
+  const createdUser = new User({
     name,
     email,
-    password
-  };
+    password,
+    image:
+      "https://bkimg.cdn.bcebos.com/pic/8644ebf81a4c510f7c7e489a6959252dd52aa5fc?x-bce-process=image/resize,m_lfit,w_536,limit_1/format,f_auto",
+    places
+  });
 
-  DUMMY_USERS.push(createdUser);
+  try {
+    await createdUser.save();
+  } catch (error) {
+    console.log("Creating user failed. Please try again.");
+    next(new HttpError("Signing up failed. Please try again.", 500));
+    return;
+  }
 
-  res.status(201).json({ "user created": createdUser });
+  // adding "toObject" here to add "id" is optional?
+  res.status(201).json({ "user created": createdUser.toObject({ getters: true }) });
 };
 
 const loginUser = (req, res, next) => {
