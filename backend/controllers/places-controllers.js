@@ -1,10 +1,12 @@
 const uuid = require('uuid');
 // const uuidv4 = uuid.v4; // then to use: uuidv4()
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 const HttpError = require('../models/http-error');
 const getCoordinatesForAddress = require('../util/location');
 const Place = require('../models/place');
+const User = require('../models/user');
 
 // let DUMMY_PLACES = [
 //   {
@@ -147,8 +149,38 @@ const createPlace = async (req, res, next) => {
     creator,
   });
 
+  // check whether the userid provided in creator exists;
+  let existingUser;
   try {
-    await createdPlace.save();
+    existingUser = await User.findById(creator);
+    // existingUser = await User.findOne({ creator: creator });
+  } catch (error) {
+    const err = new HttpError(
+      "Search for user failed.",
+      500
+    );
+    next(err);
+    return;
+  }
+
+  if (!existingUser) {
+    next(
+      new HttpError(
+        "The provided creator does not exist.",
+        422 // or 404
+      )
+    );
+    return;
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await createdPlace.save({ session: session });
+    existingUser.places.push(createdPlace); // Mongoose .push() - only pushes the id
+    await existingUser.save({ session });
+    await session.commitTransaction(); // commit all changes
+
     // DUMMY_PLACES.push(createdPlace); // or: .unshift(createdPlace)
   } catch (error) {
     console.log("Creating place failed. Please try again.");
