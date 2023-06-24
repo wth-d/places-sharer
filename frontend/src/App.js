@@ -78,7 +78,7 @@ export default App;
 
 
 
-
+// old routes setup:
       // (<Router>
       //   <MainNavigation />
       //   <main>

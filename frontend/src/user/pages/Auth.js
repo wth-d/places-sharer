@@ -27,11 +27,34 @@ const Auth = () => {
 
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  const loginSubmitHandler = (event) => {
+  const loginSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs);
+
     if (isLoginMode) {
-      auth.login();
+      auth.login(); // or could log in for both signup and login modes
+    } else {
+      try {
+        const response = await fetch('http://localhost:5000/api/users/signup', {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json', // so that bodyParser.json() can parse it correctly
+          },
+          body: JSON.stringify({
+            name: formState.inputs['user-name'].value,
+            email: formState.inputs['user-email'].value,
+            password: formState.inputs['password'].value
+          })
+        });
+        if (response.ok) {
+          const jsonResponse = await response.json();
+          console.log(jsonResponse);
+        } else {
+          console.log("Got a non-ok status code.");
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
