@@ -90,6 +90,7 @@ const getPlacesByUserId = async (req, res, next) => {
     return;
   }
   
+  // if (!userWithPlaces || userWithPlaces.places.length === 0)
   if (!places || places.length === 0) {
     // res
     //   .status(404)
@@ -99,7 +100,6 @@ const getPlacesByUserId = async (req, res, next) => {
       "Could not find any place for the provided user id.",
       404
     ); // has a message prop
-    // throw error;
     next(error);
     return;
   } else {
@@ -131,15 +131,6 @@ const createPlace = async (req, res, next) => {
     return; // and exit this function
   }
 
-  // const createdPlace = {
-  //   id: uuid.v4(),
-  //   title,
-  //   description,
-  //   location: coordinates,
-  //   address,
-  //   creator,
-  //   // image
-  // };
   const createdPlace = new Place({
     title,
     description,
