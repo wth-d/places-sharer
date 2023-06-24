@@ -11,6 +11,17 @@ const app = express();
 app.use(bodyParser.json());
 // automatically calls next() to go to next middleware;
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Origin, X-Requested-With, Accept"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+
+  next();
+});
+
 app.use('/api/places', placesRoutes); // register the middlewares
 app.use('/api/users', usersRoutes);
 

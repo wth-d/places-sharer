@@ -51,6 +51,9 @@ const Auth = () => {
           console.log(jsonResponse);
         } else {
           console.log("Got a non-ok status code.");
+          console.log(response);
+          const jsonResponse = await response.json();
+          console.log(jsonResponse);
         }
       } catch (error) {
         console.log(error);
