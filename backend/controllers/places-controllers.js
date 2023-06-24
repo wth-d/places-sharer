@@ -77,6 +77,7 @@ const getPlacesByUserId = async (req, res, next) => {
   let places;
   try {
     places = await Place.find({ creator: userId }); // find all places that match userId
+    // or use .populate(): userWithPlaces = await User.findById(userId).populate('places');
     // old: places = DUMMY_PLACES.filter((p) => p.creator === userId); // or for...of loop
   } catch (error) {
     console.log(error);
@@ -253,7 +254,8 @@ const deletePlace = async (req, res, next) => {
 
   let place;
   try {
-    place = await Place.findById(placeId);
+    place = await Place.findById(placeId).populate('creator');
+    // console.log(place);
   } catch (error) {
     const err = new HttpError(
       "Something went wrong. Could not find the to-be-deleted place.",
@@ -273,7 +275,12 @@ const deletePlace = async (req, res, next) => {
   }
 
   try {
-    await place.deleteOne();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await place.deleteOne({ session });
+    place.creator.places.pull(place); // pulls/removes the id only
+    await place.creator.save({ session });
+    await session.commitTransaction();
   } catch (error) {
     console.log(error);
     const err = new HttpError(
