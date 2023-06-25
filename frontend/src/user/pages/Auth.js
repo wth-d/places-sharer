@@ -53,20 +53,22 @@ const Auth = () => {
             password: formState.inputs['password'].value
           })
         });
+
+        const jsonResponse = await response.json();
+        // setIsLoading(false);
+
         if (response.ok) {
-          const jsonResponse = await response.json();
           console.log(jsonResponse);
           // no error, so display success message/banner
           setSignupSuccess(true); // maybe set it to false swh else?
 
         } else {
           console.log("Got a non-ok status code.");
-          const jsonResponse = await response.json();
-          console.log(jsonResponse);
+          throw new Error(jsonResponse.message);
         }
-      } catch (error) {
-        console.log(error);
-        setError(error.message || "Something went wrong. Please try again.");
+      } catch (err) {
+        // console.log(err);
+        setError(err.message || "Something went wrong. Please try again.");
       }
       setIsLoading(false); // stops the loading for both success&error
     }
@@ -110,49 +112,61 @@ const Auth = () => {
     setError(undefined);
   };
 
+  const errorResetHandler = () => {
+    setError(undefined);
+  };
+
   return (
-    <Card className="authentication">
-      {isLoading && <LoadingSpinner asOverlay />}
-      <h2>{isLoginMode ? "Login Required" : "Signup"}</h2>
-      <hr />
-      <form onSubmit={loginSubmitHandler}>
-        {!isLoginMode && (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={errorResetHandler} />
+      <Card className="authentication">
+        {isLoading && <LoadingSpinner asOverlay />}
+        <h2>{isLoginMode ? "Login Required" : "Signup"}</h2>
+        <hr />
+        <form onSubmit={loginSubmitHandler}>
+          {!isLoginMode && (
+            <Input
+              id="user-name"
+              element="input" //or textarea
+              type="text"
+              label="Your Name" // what's displayed
+              validators={[VALIDATOR_MINLENGTH(3)]}
+              errorText="Please enter a valid name (at least 3 characters)."
+              onInput={inputHandler}
+            />
+          )}
           <Input
-            id="user-name"
-            element="input" //or textarea
-            type="text"
-            label="Your Name" // what's displayed
-            validators={[VALIDATOR_MINLENGTH(3)]}
-            errorText="Please enter a valid name (at least 3 characters)."
+            id="user-email"
+            element="input"
+            type="email"
+            label="E-Mail"
+            validators={[VALIDATOR_EMAIL()]}
+            errorText="Please enter a valid email."
             onInput={inputHandler}
           />
-        )}
-        <Input
-          id="user-email"
-          element="input"
-          type="email"
-          label="E-Mail"
-          validators={[VALIDATOR_EMAIL()]}
-          errorText="Please enter a valid email."
-          onInput={inputHandler}
-        />
-        <Input
-          id="password"
-          element="input" //or textarea
-          type="password"
-          label="Password"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Please enter a valid password (at least 5 characters)."
-          onInput={inputHandler}
-        />
-        <Button type="submit" disabled={!formState.isValid}>
-          {isLoginMode ? "LOG IN" : "SIGN UP"}
+          <Input
+            id="password"
+            element="input" //or textarea
+            type="password"
+            label="Password"
+            validators={[VALIDATOR_MINLENGTH(5)]}
+            errorText="Please enter a valid password (at least 5 characters)."
+            onInput={inputHandler}
+          />
+          <Button type="submit" disabled={!formState.isValid}>
+            {isLoginMode ? "LOG IN" : "SIGN UP"}
+          </Button>
+        </form>
+        <Button inverse onClick={switchModeHandler}>
+          SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
         </Button>
-      </form>
-      <Button inverse onClick={switchModeHandler}>
-        SWITCH TO {isLoginMode ? "SIGNUP" : "LOGIN"}
-      </Button>
-    </Card>
+        {signupSuccess && !isLoginMode && (
+          <React.Fragment>
+            <div><br />Sign up succeeded! Please log in now.</div>
+          </React.Fragment>
+        )}
+      </Card>
+    </React.Fragment>
   );
 };
 
