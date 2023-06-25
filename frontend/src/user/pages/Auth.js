@@ -6,10 +6,16 @@ import { AuthContext } from '../../shared/context/auth-context';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import Card from '../../shared/components/UIElements/Card';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
 import './Auth.css';
+// import '../../places/pages/PlaceForm.css'; // 'place-form' class on <form>
 
 const Auth = () => {
   const auth = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(undefined); // "undefined" could be omitted
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const [formState, inputHandler, replaceFormData] = useForm(
     {
@@ -35,6 +41,7 @@ const Auth = () => {
       auth.login(); // or could log in for both signup and login modes
     } else {
       try {
+        setIsLoading(true); // re-render the page
         const response = await fetch('http://localhost:5000/api/users/signup', {
           method: 'POST',
           headers: {
@@ -49,15 +56,19 @@ const Auth = () => {
         if (response.ok) {
           const jsonResponse = await response.json();
           console.log(jsonResponse);
+          // no error, so display success message/banner
+          setSignupSuccess(true); // maybe set it to false swh else?
+
         } else {
           console.log("Got a non-ok status code.");
-          console.log(response);
           const jsonResponse = await response.json();
           console.log(jsonResponse);
         }
       } catch (error) {
         console.log(error);
+        setError(error.message || "Something went wrong. Please try again.");
       }
+      setIsLoading(false); // stops the loading for both success&error
     }
   };
 
@@ -95,13 +106,16 @@ const Auth = () => {
     setIsLoginMode((prevMode) => {
       return !prevMode;
     });
+    setSignupSuccess(false); // remove the message
+    setError(undefined);
   };
 
   return (
     <Card className="authentication">
+      {isLoading && <LoadingSpinner asOverlay />}
       <h2>{isLoginMode ? "Login Required" : "Signup"}</h2>
       <hr />
-      <form className="place-form" onSubmit={loginSubmitHandler}>
+      <form onSubmit={loginSubmitHandler}>
         {!isLoginMode && (
           <Input
             id="user-name"
