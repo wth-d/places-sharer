@@ -97,13 +97,12 @@ const loginUser = async (req, res, next) => {
     return;
   }
 
-  if (!existingUser || existingUser.password !== password) {
-    next(
-      new HttpError(
-        "A user with the provided email does not exist, or wrong password.",
-        401
-      )
-    );
+  if (!existingUser) {
+    next(new HttpError("A user with the provided email does not exist.", 401));
+    return;
+  }
+  if (existingUser.password !== password) {
+    next(new HttpError("Wrong password.", 401));
     return;
   }
 

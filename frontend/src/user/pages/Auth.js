@@ -37,11 +37,39 @@ const Auth = () => {
     event.preventDefault();
     console.log(formState.inputs);
 
+    setIsLoading(true); // re-render the page
+
     if (isLoginMode) {
-      auth.login(); // or could log in for both signup and login modes
-    } else {
       try {
-        setIsLoading(true); // re-render the page
+        const response = await fetch('http://localhost:5000/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: formState.inputs['user-email'].value,
+            password: formState.inputs['password'].value
+          })
+        });
+
+        const jsonResponse = await response.json();
+        console.log("jsonResponse:", jsonResponse);
+        setIsLoading(false);
+
+        if (response.ok) {
+          auth.login();
+        } else {
+          console.log("Got a non-ok status code.");
+          throw new Error(jsonResponse.message);
+        }
+      } catch (err) {
+        setError(err.message || "Something went wrong. Please try again.");
+        // console.log(err);
+      }
+
+      
+    } else { // sign up
+      try {
         const response = await fetch('http://localhost:5000/api/users/signup', {
           method: 'POST',
           headers: {
@@ -55,22 +83,21 @@ const Auth = () => {
         });
 
         const jsonResponse = await response.json();
-        // setIsLoading(false);
+        console.log("jsonResponse:", jsonResponse);
+        setIsLoading(false); // stops the loading for both success&error
 
         if (response.ok) {
-          console.log(jsonResponse);
           // no error, so display success message/banner
           setSignupSuccess(true); // maybe set it to false swh else?
-
+          // auth.login(); // could log in here
         } else {
           console.log("Got a non-ok status code.");
           throw new Error(jsonResponse.message);
         }
       } catch (err) {
-        // console.log(err);
         setError(err.message || "Something went wrong. Please try again.");
+        // console.log(err);
       }
-      setIsLoading(false); // stops the loading for both success&error
     }
   };
 
