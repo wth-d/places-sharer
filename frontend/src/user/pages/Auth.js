@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 
 import { VALIDATOR_MINLENGTH, VALIDATOR_EMAIL } from "../../shared/util/validators";
 import { useForm } from '../../shared/hooks/form-hook';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/context/auth-context';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -13,9 +14,7 @@ import './Auth.css';
 
 const Auth = () => {
   const auth = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(undefined); // "undefined" could be omitted
-  const [signupSuccess, setSignupSuccess] = useState(false);
+  const { isLoading, error, sendRequest, errorResetHandler } = useHttpClient();
 
   const [formState, inputHandler, replaceFormData] = useForm(
     {
@@ -32,72 +31,50 @@ const Auth = () => {
   );
 
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const loginSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs);
 
-    setIsLoading(true); // re-render the page
-
     if (isLoginMode) {
       try {
-        const response = await fetch('http://localhost:5000/api/users/login', {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: formState.inputs['user-email'].value,
-            password: formState.inputs['password'].value
-          })
-        });
+        await sendRequest( // url, method, body, headers
+          "http://localhost:5000/api/users/login",
+          "POST",
+          JSON.stringify({
+            email: formState.inputs["user-email"].value,
+            password: formState.inputs["password"].value,
+          }),
+          {
+            "Content-type": "application/json",
+          }
+        );
 
-        const jsonResponse = await response.json();
-        console.log("jsonResponse:", jsonResponse);
-        setIsLoading(false);
-
-        if (response.ok) {
-          auth.login();
-        } else {
-          console.log("Got a non-ok status code.");
-          throw new Error(jsonResponse.message);
-        }
+        auth.login();
       } catch (err) {
-        setError(err.message || "Something went wrong. Please try again.");
-        // console.log(err);
+        // console.log("An error occured in sendRequest."); // errors should have been checked in http-hook.js
       }
-
       
     } else { // sign up
       try {
-        const response = await fetch('http://localhost:5000/api/users/signup', {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json', // so that bodyParser.json() can parse it correctly
-          },
-          body: JSON.stringify({
-            name: formState.inputs['user-name'].value,
-            email: formState.inputs['user-email'].value,
-            password: formState.inputs['password'].value
-          })
-        });
+        await sendRequest(
+          "http://localhost:5000/api/users/signup",
+          "POST",
+          JSON.stringify({
+            name: formState.inputs["user-name"].value,
+            email: formState.inputs["user-email"].value,
+            password: formState.inputs["password"].value,
+          }),
+          {
+            "Content-type": "application/json", // so that bodyParser.json() can parse it correctly
+          }
+        );
 
-        const jsonResponse = await response.json();
-        console.log("jsonResponse:", jsonResponse);
-        setIsLoading(false); // stops the loading for both success&error
-
-        if (response.ok) {
-          // no error, so display success message/banner
-          setSignupSuccess(true); // maybe set it to false swh else?
-          // auth.login(); // could log in here
-        } else {
-          console.log("Got a non-ok status code.");
-          throw new Error(jsonResponse.message);
-        }
-      } catch (err) {
-        setError(err.message || "Something went wrong. Please try again.");
-        // console.log(err);
-      }
+        // no error, so display success message/banner
+        setSignupSuccess(true); // maybe set it to false swh else?
+        // auth.login(); // could log in here
+      } catch (err) {}
     }
   };
 
@@ -136,11 +113,7 @@ const Auth = () => {
       return !prevMode;
     });
     setSignupSuccess(false); // remove the message
-    setError(undefined);
-  };
-
-  const errorResetHandler = () => {
-    setError(undefined);
+    errorResetHandler(); // unneeded
   };
 
   return (

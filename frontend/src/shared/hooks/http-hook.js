@@ -23,16 +23,20 @@ export const useHttpClient = () => {
 
         const jsonResponse = await response.json();
         console.log("jsonResponse:", jsonResponse);
-        setIsLoading(false);
+        setIsLoading(false); // stops the loading for both success&error
+
+        // removes the current request's AbortController
+        activeHttpRequests.current.filter((reqCtrl) => reqCtrl !== httpAbortController);
 
         if (response.ok) {
-          return jsonResponse;
+          return jsonResponse; // if not ok, undefined is returned (error is thrown);
         } else {
           console.log("Got a non-ok status code.");
           throw new Error(jsonResponse.message);
         }
       } catch (err) {
         setError(err.message || "Something went wrong. Please try again.");
+        throw err; // to let the component know there's an error
       }
     },
     []
