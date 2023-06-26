@@ -15,9 +15,21 @@
   background: #292929;
 }
 
-.user-item a:hover,
+/* .user-item a:hover,
 .user-item a:active {
   background: #ffd900;
+} */
+
+.user-item:hover a,
+.user-item:active a,
+.user-item:hover .card,
+.user-item:active .card {
+  background: #ffd900;
+}
+
+.user-item .card { /* added */
+  background: #292929;
+  padding: 0;
 }
 
 .user-item__content {
