@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import UsersList from '../components/UsersList';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+// import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const Users = () => {
   // dummy variable
@@ -21,7 +22,7 @@ const Users = () => {
   const [loadedUsers, setLoadedUsers] = useState([]);
 
   useEffect(() => {
-    const sendRequest = async () => {
+    const fetchUsers = async () => {
       setIsLoading(true);
       try {
         const response = await fetch('http://localhost:5000/api/users');
@@ -44,7 +45,7 @@ const Users = () => {
       
       setIsLoading(false);
     };
-    sendRequest();
+    fetchUsers();
   }, []);
 
   const errorResetHandler = () => {

@@ -106,7 +106,12 @@ const loginUser = async (req, res, next) => {
     return;
   }
 
-  res.status(200).json({ message: "Logged in." });
+  res
+    .status(200)
+    .json({
+      message: "Logged in.",
+      "user logged in": existingUser.toObject({ getters: true }),
+    });
 
   // const user = DUMMY_USERS.find((u) => u.email === email);
   // if (!user) {

@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import PlacesList from '../components/PlacesList';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const DUMMY_PLACES = [
   {

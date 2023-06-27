@@ -39,7 +39,7 @@ const Auth = () => {
 
     if (isLoginMode) {
       try {
-        await sendRequest( // url, method, body, headers
+        const jsonResponse = await sendRequest( // url, method, body, headers
           "http://localhost:5000/api/users/login",
           "POST",
           JSON.stringify({
@@ -51,7 +51,7 @@ const Auth = () => {
           }
         );
 
-        auth.login();
+        auth.login(jsonResponse["user logged in"].id);
       } catch (err) {
         // console.log("An error occured in sendRequest."); // errors should have been checked in http-hook.js
       }
