@@ -56,7 +56,8 @@ const Users = () => {
     <React.Fragment>
       <ErrorModal error={error} onClear={errorResetHandler} />
       {isLoading && <div className="center"><LoadingSpinner asOverlay /></div>}
-      <UsersList items={loadedUsers} /> {/* !isLoading && loadedUsers && ... */}
+      {loadedUsers && <UsersList items={loadedUsers} />}
+      {/* !isLoading && loadedUsers && ...  -> <UsersList> component generates an error when loadedUsers is undefined */}
     </React.Fragment>
   );
 };
