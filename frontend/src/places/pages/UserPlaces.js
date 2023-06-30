@@ -58,6 +58,12 @@ const UserPlaces = () => {
   }, [sendRequest, userId]);
   // sendRequest won't trigger useEffect to re-execute since it's wrapped in useCallback
 
+  const placeDeletedHandler = (deletedPlaceId) => {
+    setLoadedPlaces((prevPlaces) => {
+      return prevPlaces.filter((place) => place.id !== deletedPlaceId);
+    });
+  };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={errorResetHandler} />
@@ -66,7 +72,9 @@ const UserPlaces = () => {
           <LoadingSpinner asOverlay />
         </div>
       )}
-      {loadedPlaces && <PlacesList items={loadedPlaces} />}
+      {loadedPlaces && (
+        <PlacesList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />
+      )}
     </React.Fragment>
   );
 };

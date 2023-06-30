@@ -282,7 +282,7 @@ const deletePlace = async (req, res, next) => {
     return;
   }
 
-  console.log(place);
+  console.log(`place deleted:\n${place}`);
   res.status(200).json({ message: "Deleted place." });
 };
 
