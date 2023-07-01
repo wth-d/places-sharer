@@ -25,3 +25,5 @@ yarn-error.log*
 
 /npm-temp-cache
 .npmrc
+
+/uploads
