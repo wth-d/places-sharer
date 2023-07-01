@@ -21,7 +21,7 @@ const ImageUpload = props => {
   };
 
   const pickedHandler = (event) => {
-    console.log(event.target); // the input component
+    // console.log(event.target); // the input component
     console.log(event.target.files); // the files selected
 
     let pickedFile;

@@ -48,7 +48,7 @@ const Auth = () => {
             password: formState.inputs["password"].value,
           }),
           {
-            "Content-type": "application/json",
+            "Content-type": "application/json", // so that bodyParser.json() can parse it correctly
           }
         );
 
@@ -59,17 +59,19 @@ const Auth = () => {
       
     } else { // sign up
       try {
+        const formData = new FormData();
+        formData.append("name", formState.inputs["user-name"].value);
+        formData.append("email", formState.inputs["user-email"].value);
+        formData.append("password", formState.inputs["password"].value);
+        formData.append("image", formState.inputs["image"].value); // key is "image" -> used by multer
+
         await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs["user-name"].value,
-            email: formState.inputs["user-email"].value,
-            password: formState.inputs["password"].value,
-          }),
-          {
-            "Content-type": "application/json", // so that bodyParser.json() can parse it correctly
-          }
+          formData
+          // { // headers should be set automatically
+          //   "Content-type": "application/json",
+          // }
         );
 
         // no error, so display success message/banner
