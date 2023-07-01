@@ -41,7 +41,7 @@ const UserPlaces = () => {
   // const loadedPlaces = DUMMY_PLACES.filter((place) => place.creator === userId);
 
   const { isLoading, error, sendRequest, errorResetHandler } = useHttpClient();
-  const [loadedPlaces, setLoadedPlaces] = useState([]);
+  const [loadedPlaces, setLoadedPlaces] = useState(undefined);
 
   useEffect(() => {
     const fetchPlacesForUser = async () => {
@@ -72,7 +72,7 @@ const UserPlaces = () => {
           <LoadingSpinner asOverlay />
         </div>
       )}
-      {loadedPlaces && (
+      {!isLoading && loadedPlaces && (
         <PlacesList items={loadedPlaces} onDeletePlace={placeDeletedHandler} />
       )}
     </React.Fragment>
