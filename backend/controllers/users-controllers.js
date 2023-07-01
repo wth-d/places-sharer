@@ -59,11 +59,11 @@ const signupUser = async (req, res, next) => {
     name,
     email,
     password,
-    image:
-      "https://bkimg.cdn.bcebos.com/pic/8644ebf81a4c510f7c7e489a6959252dd52aa5fc?x-bce-process=image/resize,m_lfit,w_536,limit_1/format,f_auto",
+    image: req.file.path, // a relative path that'll be prepended by frontend
     places: []
   });
   // https://tse2-mm.cn.bing.net/th/id/OIP-C.l6J460k_kWi0PJN1IU9C5AHaE8?pid=ImgDet&rs=1
+  // https://bkimg.cdn.bcebos.com/pic/8644ebf81a4c510f7c7e489a6959252dd52aa5fc?x-bce-process=image/resize,m_lfit,w_536,limit_1/format,f_auto
 
   try {
     await createdUser.save();
