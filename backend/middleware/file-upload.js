@@ -17,7 +17,12 @@ const fileUpload = multer({
       const extension = MIME_TYPE_MAP[file.mimetype];
       cb(null, uuid.v1() + '.' + extension); // generate a random filename
     }
-  })
+  }),
+  fileFilter: (req, file, cb) => { // validate file
+    const isValid = !!MIME_TYPE_MAP[file.mimetype];
+    let error = isValid ? null : new Error("Invalid mime type!");
+    cb(error, isValid);
+  }
 }); // returns a group of (preconfigured) middlewares
 
 module.exports = fileUpload;
