@@ -9,6 +9,7 @@ import Button from '../../shared/components/FormElements/Button';
 import Card from '../../shared/components/UIElements/Card';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import './Auth.css';
 // import '../../places/pages/PlaceForm.css'; // 'place-form' class on <form>
 
@@ -84,7 +85,8 @@ const Auth = () => {
       replaceFormData(
         {
           ...formState.inputs,
-          "user-name": undefined
+          "user-name": undefined,
+          image: undefined
           // "user-email": {
           //   ...formState["user-email"]
           // },
@@ -104,6 +106,10 @@ const Auth = () => {
             value: "",
             isValid: false,
           },
+          image: {
+            value: null,
+            isValid: false
+          }
         },
         false
       );
@@ -135,6 +141,9 @@ const Auth = () => {
               onInput={inputHandler}
             />
           )}
+          {!isLoginMode && (
+            <ImageUpload id="image" center onInput={inputHandler} />
+          )}
           <Input
             id="user-email"
             element="input"
@@ -162,7 +171,10 @@ const Auth = () => {
         </Button>
         {signupSuccess && !isLoginMode && (
           <React.Fragment>
-            <div><br />Sign up succeeded! Please log in now.</div>
+            <div>
+              <br />
+              Sign up succeeded! Please log in now.
+            </div>
           </React.Fragment>
         )}
       </Card>
