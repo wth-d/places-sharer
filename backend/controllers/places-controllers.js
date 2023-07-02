@@ -111,8 +111,9 @@ const getPlacesByUserId = async (req, res, next) => {
 
 const createPlace = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
-  if (!errors.isEmpty()) {
+  if (!errors.isEmpty() || !req.file) {
     console.log(errors);
+    if (!req.file) console.log(`error: req.file is ${req.file}`);
     next(new HttpError("Invalid inputs passed. Please check your JSON data.", 422));
     return;
   }
@@ -134,8 +135,7 @@ const createPlace = async (req, res, next) => {
   const createdPlace = new Place({
     title,
     description,
-    image:
-      "https://cdn.theculturetrip.com/wp-content/uploads/2017/01/canton-tower-1200872_1920.jpg", // a URL
+    image: req.file.path, // a relative path
     location: coordinates,
     address,
     creator,

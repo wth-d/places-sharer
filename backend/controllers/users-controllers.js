@@ -25,7 +25,8 @@ const getAllUsers = async (req, res, next) => {
 
 const signupUser = async (req, res, next) => {
   const errors = validationResult(req); // get validation errors
-  if (!errors.isEmpty()) {
+  if (!errors.isEmpty() || !req.file) {
+    if (!req.file) console.log(`error: req.file is ${req.file}`);
     // console.log(errors);
     next(new HttpError("Invalid inputs passed. Please check your JSON data.", 422));
     return;
@@ -64,6 +65,7 @@ const signupUser = async (req, res, next) => {
   });
   // https://tse2-mm.cn.bing.net/th/id/OIP-C.l6J460k_kWi0PJN1IU9C5AHaE8?pid=ImgDet&rs=1
   // https://bkimg.cdn.bcebos.com/pic/8644ebf81a4c510f7c7e489a6959252dd52aa5fc?x-bce-process=image/resize,m_lfit,w_536,limit_1/format,f_auto
+  // https://cdn.theculturetrip.com/wp-content/uploads/2017/01/canton-tower-1200872_1920.jpg
 
   try {
     await createdUser.save();

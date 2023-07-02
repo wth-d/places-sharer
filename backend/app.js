@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 // automatically calls next() to go to next middleware;
 
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
+app.use("/uploads/places-images", express.static(path.join("uploads", "places-images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
