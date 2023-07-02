@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const uuid = require('uuid');
 // const uuidv4 = uuid.v4; // then to use: uuidv4()
 const { validationResult } = require('express-validator');
@@ -265,6 +267,8 @@ const deletePlace = async (req, res, next) => {
     return;
   }
 
+  const imagePath = place.image;
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -281,6 +285,10 @@ const deletePlace = async (req, res, next) => {
     next(err);
     return;
   }
+
+  fs.unlink(imagePath, (err) => {
+    if (err) console.log(err);
+  });
 
   console.log(`place deleted:\n${place}`);
   res.status(200).json({ message: "Deleted place." });
