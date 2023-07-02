@@ -63,7 +63,8 @@ const Auth = () => {
         formData.append("name", formState.inputs["user-name"].value);
         formData.append("email", formState.inputs["user-email"].value);
         formData.append("password", formState.inputs["password"].value);
-        formData.append("image", formState.inputs["image"].value); // key is "image" -> used by multer
+        formData.append("image", formState.inputs["image"].value);
+        // key (1st argument) is "image" -> used by multer in backend
 
         await sendRequest(
           "http://localhost:5000/api/users/signup",
@@ -144,7 +145,12 @@ const Auth = () => {
             />
           )}
           {!isLoginMode && (
-            <ImageUpload id="image" center onInput={inputHandler} />
+            <ImageUpload
+              id="image"
+              center
+              onInput={inputHandler}
+              errorText="Please provide an image."
+            />
           )}
           <Input
             id="user-email"
