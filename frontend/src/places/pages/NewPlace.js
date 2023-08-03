@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Input from "../../shared/components/FormElements/Input";
@@ -33,6 +33,14 @@ const NewPlace = () => {
       image: { // the key in useForm has to match the id of the corresponding <Input>/<ImageUpload> component in the JSX below
         value: null,
         isValid: false
+      },
+      "visible-choice1": {
+        value: "public", // shouldn't use useForm or inputState(Input.js) for this? - nopes, still use them
+        isValid: true
+      },
+      "visible-choice2": {
+        value: "",
+        isValid: true
       }
     },
     false
@@ -65,6 +73,9 @@ const NewPlace = () => {
     } catch (err) {}
   };
 
+  const [visibility, setVisibility] = useState("public");
+
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={errorResetHandler} />
@@ -79,6 +90,36 @@ const NewPlace = () => {
           onInput={inputHandler}
           errorText="Please provide an image."
         />
+        <fieldset>
+          <p>Visibility:</p>
+          {/* <Button type="button" disabled={false} onClick={}>{visibility}</Button> */}
+          <div>
+            <Input
+              type="radio"
+              id="visible-choice1"
+              element="input"
+              name="visibility"
+              value="public"
+              // checked //
+              initialIsValid={true}
+              label="Public"
+              validators={[]} // none needed
+              onInput={inputHandler}
+            />
+            <Input
+              type="radio"
+              id="visible-choice2"
+              element="input"
+              name="visibility"
+              value="private"
+              // checked
+              initialIsValid={true}
+              label="Private"
+              validators={[]} // none needed
+              onInput={inputHandler}
+            />
+          </div>
+        </fieldset>
         <Input
           id="place-title"
           element="input"
