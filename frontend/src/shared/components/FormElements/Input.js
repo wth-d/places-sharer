@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 
 import { validate } from "../../util/validators"; 
 import "./Input.css";
@@ -52,20 +52,6 @@ const Input = (props) => {
       validators: props.validators,
     });
     // dispatch -> calls the inputReducer() callback function (to dispatch the CHANGE event)
-
-    if (props.type === "radio") { // && props.element === "input"
-      console.log("event.target.value is", event.target.value);
-
-      const toUpdate = (props.id === "visible-choice1") ? "visible-choice2" : "visible-choice1";
-      // dispatch() // can't dispatch to the other Input component's inputState
-      // onInputProp(toUpdate, "", true); // reset the other choice
-
-      // if (props.value === "public") {
-      //   setVisibility("public");
-      // } else {
-      //   setVisibility("private");
-      // }
-    }
   };
 
   const touchHandler = () => {
@@ -74,36 +60,18 @@ const Input = (props) => {
     });
   };
 
-  // const [visibility, setVisibility] = useState("public"); // only used for radio input
-
   let element;
   if (props.element === "input") {
-    if (props.type === "radio") {
-      // for radio, we do not use inputState (or use useForm hook) -> nope, still use these
-      element = (
-        <input
-          id={props.id}
-          type={props.type}
-          name={props.name}
-          placeholder={props.placeholder} // not used?
-          onChange={changeHandler}
-          onBlur={touchHandler}
-          value={props.value} // fixed?
-          checked={props.checked} // {visibility === "public" ? true : false}
-        />
-      );
-    } else {
-      element = (
-        <input
-          id={props.id}
-          type={props.type}
-          placeholder={props.placeholder}
-          onChange={changeHandler}
-          onBlur={touchHandler}
-          value={inputState.value}
-        />
-      );
-    }
+    element = (
+      <input
+        id={props.id}
+        type={props.type}
+        placeholder={props.placeholder}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={inputState.value}
+      />
+    );
   } else {
     element = (
       <textarea
