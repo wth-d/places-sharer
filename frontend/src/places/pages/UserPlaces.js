@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import PlacesList from '../components/PlacesList';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
+import { AuthContext } from '../../shared/context/auth-context';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 
 // const DUMMY_PLACES = [
@@ -19,6 +20,7 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 //       lng: -79.4084233,
 //     },
 //     creator: "u2",
+//     visibility: "public",
 //   },
 //   {
 //     id: "p1",
@@ -32,13 +34,16 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 //       lng: -79.4084233,
 //     },
 //     creator: "u1",
+//     visibility: "public",
 //   },
 // ];
 
 // fetches (from backend) and renders all places of a user
 const UserPlaces = () => {
-  const userId = useParams().userId;
+  const userId = useParams().userId; // this user's places will be displayed by this component
   // const loadedPlaces = DUMMY_PLACES.filter((place) => place.creator === userId);
+
+  const auth = useContext(AuthContext);
 
   const { isLoading, error, sendRequest, errorResetHandler } = useHttpClient();
   const [loadedPlaces, setLoadedPlaces] = useState(undefined);
@@ -50,12 +55,32 @@ const UserPlaces = () => {
           `http://localhost:5000/api/places/user/${userId}`
         );
 
+        // filter the places array
+        // logged in - only keep a place if it (either belongs to current user OR is public)
+        // not logged in - only keep a place if it is public
+        const DUMMY_PLACES = [];
+        DUMMY_PLACES.filter((place) => {
+          if (auth.isLoggedIn) {
+            const currentUid = auth.userId; // different from "useParams().userId" above
+
+            if (place.creator === currentUid) {
+              return true;
+            } else if (place.visibility === "public") { // doesn't belong to current user, but is public
+              return true;
+            } else {
+              return false;
+            }
+          } else { // not logged in
+            return place.visibility === "public";
+          }
+        });
+
         setLoadedPlaces(jsonResponse.places);
       } catch (err) {}
     };
 
     fetchPlacesForUser();
-  }, [sendRequest, userId]);
+  }, [sendRequest, userId, auth.isLoggedIn, auth.userId]);
   // sendRequest won't trigger useEffect to re-execute since it's wrapped in useCallback
 
   const placeDeletedHandler = (deletedPlaceId) => {
