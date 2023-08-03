@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Input from "../../shared/components/FormElements/Input";
@@ -46,6 +46,7 @@ const NewPlace = () => {
   const placeSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs); // send this to the backend
+    console.log("visibility:", visibility);
 
     const formData = new FormData();
     formData.append("title", formState.inputs["place-title"].value);
@@ -63,6 +64,16 @@ const NewPlace = () => {
       // redirect the user to a different page (home page)
       history.push('/');
     } catch (err) {}
+  };
+
+  const [visibility, setVisibility] = useState("public"); // public by default
+
+  const selectChangeHandler = (event) => {
+    // executed whenever the user selects a different visibility;
+
+    console.log("event.target.value is", event.target.value);    
+    
+    setVisibility(event.target.value);
   };
 
   return (
@@ -104,6 +115,37 @@ const NewPlace = () => {
           errorText="Please enter a valid address."
           onInput={inputHandler}
         />
+
+        <fieldset>
+          <p>Visibility: (public by default)</p>
+          {/* <Button type="button" disabled={false} onClick={}>{visibility}</Button> */}
+          <div>
+            <input
+              type="radio"
+              id="visible-choice1"
+              element="input"
+              name="visibility"
+              value="public"
+              // checked // cannot use
+              onChange={selectChangeHandler}
+              required
+            />
+            <label htmlFor="visible-choice1">Public</label>
+
+            <input
+              type="radio"
+              id="visible-choice2"
+              element="input"
+              name="visibility"
+              value="private"
+              // checked={false}
+              onChange={selectChangeHandler}
+              required
+            />
+            <label htmlFor="visible-choice2">Private</label>
+          </div>
+        </fieldset>
+
         <Button type="submit" disabled={!formState.isValid}>
           ADD PLACE
         </Button>
