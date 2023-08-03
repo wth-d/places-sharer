@@ -25,4 +25,5 @@ yarn-error.log*
 
 /npm-temp-cache
 .npmrc
+.vscode/extensions.json
 src/table.html
