@@ -32,9 +32,9 @@ app.use('/api/places', placesRoutes); // register the middlewares
 app.use('/api/users', usersRoutes);
 
 // handles unsupported routes;
-// this middleware is reached only if a request wasn't handled by 
-// a middleware in the front (which don't call next()); this means that 
-// this request is one that we don't want to handle;
+// this middleware is reached only if a request wasn't handled by a middleware
+// in the front (which don't call next() with no argument); this
+// means that this request is one that we don't want to handle;
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);
   throw error;
@@ -51,6 +51,7 @@ app.use((error, req, res, next) => {
     // a response has somehow already been sent
     next(error);
     return;
+    // Note: it might end up here if an image url cannot be found & served statically.
   }
   res.status(error.code || 500);
   res.json({
