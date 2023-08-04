@@ -112,6 +112,7 @@ const UpdatePlace = () => {
     } catch (err) {}
   };
 
+  // initial value of "visibility" is to be fetched by backend, and will be null if backend fails to fetch it
   const [visibility, setVisibility] = useState(undefined);
   const selectChangeHandler = (event) => {
     // executed whenever the user selects a different visibility;
