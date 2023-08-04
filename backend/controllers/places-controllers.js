@@ -120,7 +120,7 @@ const createPlace = async (req, res, next) => {
     return;
   }
 
-  const { title, description, address, creator } = req.body;
+  const { title, description, address, creator, isprivate } = req.body;
   // same as: const title = req.body.title;
 
   let coordinates;
@@ -140,6 +140,7 @@ const createPlace = async (req, res, next) => {
     image: req.file.path, // a relative path
     location: coordinates,
     address,
+    isprivate,
     creator,
   });
 
@@ -147,7 +148,7 @@ const createPlace = async (req, res, next) => {
   let existingUser;
   try {
     existingUser = await User.findById(creator);
-    // existingUser = await User.findOne({ creator: creator });
+    // existingUser = await User.findOne({ "_id": creator });
   } catch (error) {
     const err = new HttpError(
       "Search for user failed.",
@@ -193,7 +194,7 @@ const updatePlace = async (req, res, next) => {
   }
 
   const placeId = req.params.pId;
-  const { title, description } = req.body;
+  const { title, description, isprivate } = req.body;
 
   let place;
   try {
@@ -218,6 +219,7 @@ const updatePlace = async (req, res, next) => {
 
   place.title = title;
   place.description = description;
+  place.isprivate = isprivate;
 
   try {
     await place.save(); // save the updated place
