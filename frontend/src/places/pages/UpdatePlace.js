@@ -58,8 +58,10 @@ const UpdatePlace = () => {
         const jsonResponse = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
 
         setIdentifiedPlace(jsonResponse.place);
+        setVisibility("public"); // to be modified
       } catch (err) {
         setIdentifiedPlace(null);
+        setVisibility(null);
       }
     };
 
@@ -90,8 +92,10 @@ const UpdatePlace = () => {
   const placeUpdateSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs);
+    console.log("before submit: visibility is", visibility);
 
     try {
+      // if visibility sent is null/undefined, the backend shouldn't update it;
       await sendRequest(
         `http://localhost:5000/api/places/${placeId}`,
         "PATCH",
@@ -106,6 +110,14 @@ const UpdatePlace = () => {
 
       history.push(`/${identifiedPlace.creator}/places`);
     } catch (err) {}
+  };
+
+  const [visibility, setVisibility] = useState(undefined);
+  const selectChangeHandler = (event) => {
+    // executed whenever the user selects a different visibility;
+    console.log("event.target.value is", event.target.value);
+
+    setVisibility(event.target.value);
   };
 
   if (isLoading) {
@@ -154,6 +166,35 @@ const UpdatePlace = () => {
             initialValue={identifiedPlace.description} // formState["inputs"]["description2"]["value"]
             initialIsValid={true}
           />
+
+          <fieldset>
+            <p>Visibility: {!!visibility && `(currently ${visibility})`}</p>
+            {/* <Button type="button" disabled={false} onClick={}>{visibility}</Button> */}
+            <div>
+              <input
+                type="radio"
+                id="visible-choice1"
+                element="input"
+                name="visibility"
+                value="public"
+                // checked // cannot use
+                onChange={selectChangeHandler}
+              />
+              <label htmlFor="visible-choice1">Public&ensp;</label>
+
+              <input
+                type="radio"
+                id="visible-choice2"
+                element="input"
+                name="visibility"
+                value="private"
+                // checked={false}
+                onChange={selectChangeHandler}
+              />
+              <label htmlFor="visible-choice2">Private</label>
+            </div>
+          </fieldset>
+
           <Button type="submit" disabled={!formState.isValid}>
             UPDATE PLACE
           </Button>
