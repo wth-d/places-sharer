@@ -58,6 +58,8 @@ const UserPlaces = () => {
         // filter the places array
         // logged in - only keep a place if it (either belongs to current user OR is public)
         // not logged in - only keep a place if it is public
+        
+        // temporary
         const DUMMY_PLACES = [];
         DUMMY_PLACES.filter((place) => {
           if (auth.isLoggedIn) {

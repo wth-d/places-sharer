@@ -131,6 +131,7 @@ const NewPlace = () => {
               required
             />
             <label htmlFor="visible-choice1">Public</label>
+            <span>&ensp;</span>
 
             <input
               type="radio"
