@@ -123,6 +123,12 @@ const createPlace = async (req, res, next) => {
   const { title, description, address, creator, isprivate } = req.body;
   // same as: const title = req.body.title;
 
+  // validate "isprivate"; (when received, isprivate will be a string;)
+  if (isprivate !== "true" && isprivate !== "false") {
+    next(new HttpError("Wrong value for input isprivate.", 422));
+    return;
+  }
+
   let coordinates;
   try {
     coordinates = await getCoordinatesForAddress(address);
@@ -195,6 +201,15 @@ const updatePlace = async (req, res, next) => {
 
   const placeId = req.params.pId;
   const { title, description, isprivate } = req.body;
+
+  // validate "isprivate"
+  if (isprivate !== true && isprivate !== false) {
+    // console.log(`isprivate is '${isprivate}'`);
+    // console.log("isprivate!=='true':", isprivate !== "true");
+    // console.log("isprivate!==true:", isprivate !== true);
+    next(new HttpError("Wrong value for input isprivate.", 422));
+    return;
+  }
 
   let place;
   try {

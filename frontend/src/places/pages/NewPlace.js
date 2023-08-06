@@ -48,10 +48,14 @@ const NewPlace = () => {
     console.log(formState.inputs); // send this to the backend
     console.log("visibility:", visibility);
 
+    const isprivate =
+      (visibility === "private") ? true : (visibility === "public") ? false : null;
+
     const formData = new FormData();
     formData.append("title", formState.inputs["place-title"].value);
     formData.append("description", formState.inputs["description"].value);
     formData.append("address", formState.inputs["address"].value);
+    formData.append("isprivate", isprivate);
     formData.append("creator", auth.userId);
     formData.append("image", formState.inputs["image"].value);
     try {
@@ -128,7 +132,7 @@ const NewPlace = () => {
               value="public"
               // checked // cannot use
               onChange={selectChangeHandler}
-              required
+              //required // public by default, so not needed
             />
             <label htmlFor="visible-choice1">Public</label>
             <span>&ensp;</span>
@@ -141,7 +145,7 @@ const NewPlace = () => {
               value="private"
               // checked={false}
               onChange={selectChangeHandler}
-              required
+              //required
             />
             <label htmlFor="visible-choice2">Private</label>
           </div>

@@ -58,7 +58,9 @@ const UpdatePlace = () => {
         const jsonResponse = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
 
         setIdentifiedPlace(jsonResponse.place);
-        setVisibility("public"); // to be modified
+        setVisibility(
+          jsonResponse.place.isprivate === true ? "private" : "public"
+        );
       } catch (err) {
         setIdentifiedPlace(null);
         setVisibility(null);
@@ -95,13 +97,19 @@ const UpdatePlace = () => {
     console.log("before submit: visibility is", visibility);
 
     try {
-      // if visibility sent is null/undefined, the backend shouldn't update it;
+      // if visibility sent is not 'public' or 'private' (e.g. null), the backend shouldn't update it;
       await sendRequest(
         `http://localhost:5000/api/places/${placeId}`,
         "PATCH",
         JSON.stringify({
           title: formState["inputs"]["place-title2"]["value"],
           description: formState["inputs"]["description2"]["value"],
+          isprivate:
+            visibility === "private"
+              ? true
+              : visibility === "public"
+              ? false
+              : null,
         }),
         {
           "Content-type": "application/json",
