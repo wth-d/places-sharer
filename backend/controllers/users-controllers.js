@@ -1,5 +1,6 @@
 // const uuid = require('uuid');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
@@ -56,10 +57,19 @@ const signupUser = async (req, res, next) => {
     return;
   }
 
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 12);
+  } catch (error) {
+    console.log("Password hash failed.");
+    next(new HttpError("Could not create a new user. Please try again.", 500));
+    return;
+  }
+
   const createdUser = new User({
     name,
     email,
-    password,
+    password: hashedPassword,
     image: req.file.path, // a relative path that'll be prepended by frontend
     places: []
   });
@@ -104,7 +114,20 @@ const loginUser = async (req, res, next) => {
     next(new HttpError("A user with the provided email does not exist.", 401));
     return;
   }
-  if (existingUser.password !== password) {
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, existingUser.password);
+    // "password" in the database is a hashed value;
+  } catch (error) {
+    const err = new HttpError(
+      "Could not log you in. Please check your credentials and try again.",
+      500
+    );
+    next(err);
+    return;
+  }
+  if (!isValidPassword) {
     next(new HttpError("Wrong password.", 401));
     return;
   }
