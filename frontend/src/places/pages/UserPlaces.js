@@ -20,7 +20,7 @@ import { useHttpClient } from '../../shared/hooks/http-hook';
 //       lng: -79.4084233,
 //     },
 //     creator: "u2",
-//     visibility: "public",
+//     visibility: "public", // isprivate: false
 //   },
 //   {
 //     id: "p1",
@@ -58,26 +58,23 @@ const UserPlaces = () => {
         // filter the places array
         // logged in - only keep a place if it (either belongs to current user OR is public)
         // not logged in - only keep a place if it is public
-        
-        // temporary
-        const DUMMY_PLACES = [];
-        DUMMY_PLACES.filter((place) => {
+        const visiblePlaces = jsonResponse.places.filter((place) => {
           if (auth.isLoggedIn) {
             const currentUid = auth.userId; // different from "useParams().userId" above
 
             if (place.creator === currentUid) {
               return true;
-            } else if (place.visibility === "public") { // doesn't belong to current user, but is public
+            } else if (place.isprivate === false) { // doesn't belong to current user, but is public
               return true;
             } else {
               return false;
             }
           } else { // not logged in
-            return place.visibility === "public";
+            return place.isprivate === false;
           }
         });
 
-        setLoadedPlaces(jsonResponse.places);
+        setLoadedPlaces(visiblePlaces);
       } catch (err) {}
     };
 
