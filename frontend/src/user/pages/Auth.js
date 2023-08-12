@@ -52,7 +52,7 @@ const Auth = () => {
           }
         );
 
-        auth.login(jsonResponse["user logged in"].id);
+        auth.login(jsonResponse["user logged in"].id, jsonResponse.token);
       } catch (err) {
         // console.log("An error occured in sendRequest."); // errors should have been checked in http-hook.js
       }
