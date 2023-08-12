@@ -3,6 +3,7 @@ const { check } = require("express-validator");
 
 const placesControllers = require('../controllers/places-controllers');
 const fileUpload = require('../middleware/file-upload');
+const checkToken = require('../middleware/check-token');
 
 const router = express.Router();
 
@@ -10,6 +11,9 @@ const router = express.Router();
 router.get('/:pId', placesControllers.getPlaceById);
 
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
+
+// checks whether there's a valid token
+router.use(checkToken);
 
 router.post(
   "/",
