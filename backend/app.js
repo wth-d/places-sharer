@@ -22,7 +22,7 @@ app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, Origin, X-Requested-With, Accept"
-  );
+  ); // allow the frontend to add these headers to a request sent to backend
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
   next();
