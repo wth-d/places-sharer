@@ -1,6 +1,7 @@
 // const uuid = require('uuid');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
@@ -85,8 +86,17 @@ const signupUser = async (req, res, next) => {
     return;
   }
 
+  // optional: generate JWT token here
+
   // adding "toObject" here to add "id" is optional?
-  res.status(201).json({ "user created": createdUser.toObject({ getters: true }) });
+  // res.status(201).json({ "user created": createdUser.toObject({ getters: true }) });
+  res
+    .status(201)
+    .json({
+      message: "User is created.",
+      userId: createdUser.id,
+      email: createdUser.email,
+    });
 };
 
 const loginUser = async (req, res, next) => {
@@ -132,12 +142,29 @@ const loginUser = async (req, res, next) => {
     return;
   }
 
-  res
-    .status(200)
-    .json({
-      message: "Logged in.",
-      "user logged in": existingUser.toObject({ getters: true }),
-    });
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: existingUser.id, email: existingUser.email },
+      "secret-do_not_share",
+      { expiresIn: "1h" }
+    );
+  } catch (error) {
+    console.log("Token generation failed.");
+    const err = new HttpError(
+      "Logging in failed. Please check your credentials and try again.",
+      500
+    );
+    next(err);
+    return;
+  }
+
+  res.status(200).json({
+    message: "Logged in!",
+    "user logged in": { id: existingUser.id, email: existingUser.email },
+      // existingUser.toObject({ getters: true })
+    token
+  });
 
   // const user = DUMMY_USERS.find((u) => u.email === email);
   // if (!user) {
