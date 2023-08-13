@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom';
 
 import Users from './user/pages/Users';
@@ -25,7 +25,15 @@ const App = () => {
   const logout = useCallback(() => {
     setToken(null);
     setUserId(null);
+    localStorage.removeItem("userData");
   }, []);
+
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    if (storedData && storedData.token && storedData.userId) {
+      login(storedData.userId, storedData.token);
+    }
+  }, [login]); // this useEffect only runs after the app starts for the first time
 
   let routes;
   if (token) {
