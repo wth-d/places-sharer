@@ -209,7 +209,6 @@ const updatePlace = async (req, res, next) => {
 
   // validate "isprivate"
   if (isprivate !== true && isprivate !== false) {
-    // console.log(`isprivate is '${isprivate}'`);
     // console.log("isprivate!=='true':", isprivate !== "true");
     // console.log("isprivate!==true:", isprivate !== true);
     next(new HttpError("Wrong value for input isprivate.", 422));
