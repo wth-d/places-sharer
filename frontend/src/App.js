@@ -13,12 +13,19 @@ const App = () => {
   const [token, setToken] = useState(undefined); // previously isLoggedIn
   const [userId, setUserId] = useState();
 
-  const login = useCallback((uid, tokenParam) => {
+  const login = useCallback((uid, tokenParam, expirationTime) => {
     setToken(tokenParam);
     setUserId(uid);
+    const tokenExpirationTime =
+      expirationTime || new Date(new Date().getTime() + 1000 * 60 * 60);
+      // if a truthy expirationTime argument is provided, then use it; otherwise create a new expirationTime;
     localStorage.setItem(
       "userData",
-      JSON.stringify({ userId: uid, token: tokenParam })
+      JSON.stringify({
+        userId: uid,
+        token: tokenParam,
+        expiration: tokenExpirationTime.toISOString(),
+      })
     );
   }, []);
 
@@ -30,9 +37,16 @@ const App = () => {
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("userData"));
-    if (storedData && storedData.token && storedData.userId) {
-      login(storedData.userId, storedData.token);
+    if (
+      storedData &&
+      storedData.token &&
+      storedData.userId &&
+      new Date(storedData.expiration) > new Date()
+    ) {
+      login(storedData.userId, storedData.token, new Date(storedData.expiration));
     }
+
+    //if (storedData && new Date(storedData.expiration) < new Date()) {}
   }, [login]); // this useEffect only runs after the app starts for the first time
 
   let routes;
