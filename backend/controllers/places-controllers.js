@@ -129,6 +129,11 @@ const createPlace = async (req, res, next) => {
     return;
   }
 
+  if (creator !== req.userData.userId) {
+    next(new HttpError("You cannot create a place for a different user.", 403));
+    return;
+  }
+
   let coordinates;
   try {
     coordinates = await getCoordinatesForAddress(address);
@@ -232,6 +237,13 @@ const updatePlace = async (req, res, next) => {
     return;
   }
 
+  // note: "place.creator" is a Mongoose object ID type
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to edit this place.", 403);
+    next(error);
+    return;
+  }
+
   place.title = title;
   place.description = description;
   place.isprivate = isprivate;
@@ -280,6 +292,12 @@ const deletePlace = async (req, res, next) => {
       "Could not find a place for the provided pId.",
       404
     );
+    next(error);
+    return;
+  }
+
+  if (place.creator["_id"].toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to delete this place.", 403);
     next(error);
     return;
   }
