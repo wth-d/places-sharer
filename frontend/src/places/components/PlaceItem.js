@@ -43,7 +43,9 @@ const PlaceItem = props => {
         `http://localhost:5000/api/places/${placeId}`,
         "DELETE",
         null,
-        {}
+        {
+          Authorization: "Bearer " + auth.token
+        }
       );
       
       props.onDelete(placeId); // refresh the page (and remove the place)

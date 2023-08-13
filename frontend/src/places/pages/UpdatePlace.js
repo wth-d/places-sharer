@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 
 import Input from '../../shared/components/FormElements/Input';
@@ -12,6 +12,7 @@ import {
 } from '../../shared/util/validators';
 import { useForm } from '../../shared/hooks/form-hook';
 import { useHttpClient } from '../../shared/hooks/http-hook';
+import { AuthContext } from '../../shared/context/auth-context';
 import './PlaceForm.css';
 
 const UpdatePlace = () => {
@@ -50,6 +51,7 @@ const UpdatePlace = () => {
   
   const { isLoading, error, sendRequest, errorResetHandler } = useHttpClient();
   const [identifiedPlace, setIdentifiedPlace] = useState();
+  const auth = useContext(AuthContext);
   const history = useHistory();
 
   useEffect(() => {
@@ -113,6 +115,7 @@ const UpdatePlace = () => {
         }),
         {
           "Content-type": "application/json",
+          Authorization: "Bearer " + auth.token
         }
       );
 
