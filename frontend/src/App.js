@@ -17,7 +17,7 @@ const App = () => {
 
   const login = useCallback((uid, tokenParam, expirationTime) => {
     const tokenExpirationTime =
-      expirationTime || new Date(new Date().getTime() + 3000);
+      expirationTime || new Date(new Date().getTime() + 1000 * 60 * 60);
       // if a truthy expirationTime argument is provided, then use it; otherwise create a new expirationTime;
     localStorage.setItem(
       "userData",
@@ -61,6 +61,7 @@ const App = () => {
       clearTimeout(logoutTimer);
     }
   }, [token, logout]); // reruns when token changes (i.e. login or logout is called); (logout() won't change;)
+
 
   let routes;
   if (token) {
