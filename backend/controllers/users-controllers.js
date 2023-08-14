@@ -22,7 +22,17 @@ const getAllUsers = async (req, res, next) => {
 
   res
     .status(200)
-    .json({ users: users.map((user) => user.toObject({ getters: true })) });
+    .json({
+      users: users.map((user) => { // don't include the place IDs of each user
+        return {
+          id: user.id,
+          name: user.name,
+          image: user.image,
+          numPlaces: user.places.length,
+        };
+      }),
+    });
+    // .json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signupUser = async (req, res, next) => {
