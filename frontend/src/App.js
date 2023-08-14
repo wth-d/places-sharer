@@ -9,15 +9,15 @@ import UpdatePlace from './places/pages/UpdatePlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import { AuthContext } from './shared/context/auth-context';
 
+let logoutTimer = 100;
+
 const App = () => {
   const [token, setToken] = useState(undefined); // previously isLoggedIn
   const [userId, setUserId] = useState();
 
   const login = useCallback((uid, tokenParam, expirationTime) => {
-    setToken(tokenParam);
-    setUserId(uid);
     const tokenExpirationTime =
-      expirationTime || new Date(new Date().getTime() + 1000 * 60 * 60);
+      expirationTime || new Date(new Date().getTime() + 3000);
       // if a truthy expirationTime argument is provided, then use it; otherwise create a new expirationTime;
     localStorage.setItem(
       "userData",
@@ -27,6 +27,8 @@ const App = () => {
         expiration: tokenExpirationTime.toISOString(),
       })
     );
+    setToken(tokenParam);
+    setUserId(uid);
   }, []);
 
   const logout = useCallback(() => {
@@ -40,14 +42,25 @@ const App = () => {
     if (
       storedData &&
       storedData.token &&
-      storedData.userId &&
       new Date(storedData.expiration) > new Date()
     ) {
       login(storedData.userId, storedData.token, new Date(storedData.expiration));
     }
 
-    //if (storedData && new Date(storedData.expiration) < new Date()) {}
+    //if (storedData && new Date(storedData.expiration) < new Date()) { log out }
   }, [login]); // this useEffect only runs after the app starts for the first time
+
+  // timer
+  useEffect(() => {
+    const storedData = JSON.parse(localStorage.getItem("userData"));
+    if (token && storedData) { // executed when logging in
+      const remainingTime = new Date(storedData.expiration).getTime() - new Date().getTime();
+      //if (remainingTime < 0) logout();
+      logoutTimer = setTimeout(logout, remainingTime);
+    } else { // executed when logging out
+      clearTimeout(logoutTimer);
+    }
+  }, [token, logout]); // reruns when token changes (i.e. login or logout is called); (logout() won't change;)
 
   let routes;
   if (token) {
