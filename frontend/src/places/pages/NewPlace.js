@@ -56,7 +56,7 @@ const NewPlace = () => {
     formData.append("description", formState.inputs["description"].value);
     formData.append("address", formState.inputs["address"].value);
     formData.append("isprivate", isprivate);
-    formData.append("creator", auth.userId);
+    formData.append("creator", auth.userId); // cannot be other users' id;
     formData.append("image", formState.inputs["image"].value);
     try {
       await sendRequest(

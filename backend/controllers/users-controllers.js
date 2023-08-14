@@ -23,7 +23,7 @@ const getAllUsers = async (req, res, next) => {
   res
     .status(200)
     .json({
-      users: users.map((user) => { // don't include the place IDs of each user
+      users: users.map((user) => { // do not include the place IDs of each user
         return {
           id: user.id,
           name: user.name,
