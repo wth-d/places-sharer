@@ -105,6 +105,13 @@ const getPlacesByUserId = async (req, res, next) => {
     next(error);
     return;
   } else {
+    // -----------------------------
+    // optional: (similar to check-token.js) check whether it's authenticated
+    // and whether the authenticated user is the same as userId of this request;
+    // if so, can just use all places found;
+    // if not, need to filter for public places;
+    // -----------------------------
+
     res.json({
       places: places.map((place) => place.toObject({ getters: true })),
     });
