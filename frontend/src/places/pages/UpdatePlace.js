@@ -57,7 +57,7 @@ const UpdatePlace = () => {
   useEffect(() => {
     const findPlace = async () => {
       try {
-        const jsonResponse = await sendRequest(`http://localhost:5000/api/places/${placeId}`);
+        const jsonResponse = await sendRequest(`${process.env.REACT_APP_Backend_URL}/api/places/${placeId}`);
 
         setIdentifiedPlace(jsonResponse.place);
         setVisibility(
@@ -101,7 +101,7 @@ const UpdatePlace = () => {
     try {
       // if visibility sent is not 'public' or 'private' (e.g. null), the backend shouldn't update it;
       await sendRequest(
-        `http://localhost:5000/api/places/${placeId}`,
+        `${process.env.REACT_APP_Backend_URL}/api/places/${placeId}`,
         "PATCH",
         JSON.stringify({
           title: formState["inputs"]["place-title2"]["value"],

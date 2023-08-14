@@ -41,7 +41,7 @@ const Auth = () => {
     if (isLoginMode) {
       try {
         const jsonResponse = await sendRequest( // url, method, body, headers
-          "http://localhost:5000/api/users/login",
+          process.env.REACT_APP_Backend_URL + "/api/users/login",
           "POST",
           JSON.stringify({
             email: formState.inputs["user-email"].value,
@@ -67,7 +67,7 @@ const Auth = () => {
         // key (1st argument) is "image" -> used by multer in backend
 
         await sendRequest(
-          "http://localhost:5000/api/users/signup",
+          process.env.REACT_APP_Backend_URL + "/api/users/signup",
           "POST",
           formData
           // { // headers should be set automatically

@@ -52,7 +52,7 @@ const UserPlaces = () => {
     const fetchPlacesForUser = async () => {
       try {
         const jsonResponse = await sendRequest(
-          `http://localhost:5000/api/places/user/${userId}`
+          `${process.env.REACT_APP_Backend_URL}/places/user/${userId}`
         );
 
         // filter the places array

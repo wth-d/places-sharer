@@ -23,6 +23,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+.env
+
 /npm-temp-cache
 .npmrc
 .vscode/extensions.json
