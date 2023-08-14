@@ -18,7 +18,7 @@ module.exports = (req, res, next) => {
       throw new Error("Authentication failed!");
     }
 
-    const decodedPayload = jwt.verify(token, "secret-do_not_share"); // returns the decoded payload of the token
+    const decodedPayload = jwt.verify(token, process.env.JWT_key); // returns the decoded payload of the token
     req.userData = { userId: decodedPayload.userId };
     next(); // if no error above, then the token is successfully verified;
   } catch (error) {

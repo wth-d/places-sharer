@@ -60,7 +60,7 @@ app.use((error, req, res, next) => {
 });
 
 
-const dbUrl = "mongodb+srv://wth:iyftPQx7QCJdehCr@cluster0.vhz6pgo.mongodb.net/places-db?retryWrites=true&w=majority";
+const dbUrl = `mongodb+srv://${process.env.DB_user}:${process.env.DB_password}@cluster0.vhz6pgo.mongodb.net/${process.env.DB_name}?retryWrites=true&w=majority`;
 
 mongoose.connect(dbUrl)
   .then(() => {

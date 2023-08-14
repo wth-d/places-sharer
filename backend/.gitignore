@@ -26,4 +26,6 @@ yarn-error.log*
 /npm-temp-cache
 .npmrc
 
+nodemon.json
+
 /uploads
