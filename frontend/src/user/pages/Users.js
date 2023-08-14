@@ -26,8 +26,6 @@ const Users = () => {
       setIsLoading(true);
       try {
         const response = await fetch(process.env.REACT_APP_Backend_URL + '/api/users');
-        console.log("env.sth:", process.env.REACT_APP_Backend_URL);
-        console.log("env:", process.env);
 
         const jsonResponse = await response.json();
         console.log("jsonResponse:", jsonResponse);
